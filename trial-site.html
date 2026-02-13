@@ -27,6 +27,12 @@
         background-repeat: no-repeat;
         background-position: center;
     }
+    .info-page {
+        height: 500px;
+        width: 500px;
+        background: #fff;
+        background-position: center;
+    }
     div.custom-tooltip span {
         visibility: hidden;
         position: absolute;
@@ -63,41 +69,93 @@
 <script>
 // Create viewer
 viewer = pannellum.viewer('panorama', ﻿{
-    "type": "equirectangular",
-    "panorama": "images/GS__0077.JPG",
-    //"hotSpotDebug": true,
-    "hotSpots": [
-        {
-            "pitch": 15,
-            "yaw": -175,
-            "cssClass": "custom-hotspot",
-            "createTooltipFunc": hotspot,
-            "createTooltipArgs": {
-                "image": "images/chonta_bundle.png",
-                "text": "Chonta Bundle"
-            }
+    "default": {
+        "firstScene": "beach",
+        "sceneFadeDuration": 1000
+    },
+
+    "scenes": {
+        "beach": {
+            "title": "Beach",
+            "hfov": 110,
+            "pitch": -3,
+            "yaw": 117,
+            "type": "equirectangular",
+            "panorama": "images/GS__0077.JPG",
+            //"hotSpotDebug": true,
+            "hotSpots": [
+                {
+                    "pitch": -23.6,
+                    "yaw": -101.7,
+                    "cssClass": "custom-hotspot",
+                    "createTooltipFunc": hotspot,
+                    "createTooltipArgs": {
+                        "image": "images/bowl.png",
+                        "text": "Bowl"
+                    },
+                    // "clickHandlerFunc": showPanel,
+                    // "clickHandlerArgs": {"panelId": "bowl-panel"} 
+                    // ^ TODO: Fix null read error on clickHandlerFunc
+                },
+                {
+                    "pitch": -19.3,
+                    "yaw": 39.2,
+                    "cssClass": "custom-hotspot",
+                    "createTooltipFunc": hotspot,
+                    "createTooltipArgs": {
+                        "image": "images/manioc_root.png",
+                        "text": "Manioc Root"
+                    }
+                },
+                {
+                    "pitch": -2.2,
+                    "yaw": -126.6,
+                    "type": "scene",
+                    "text": "Path to Jungle",
+                    "sceneId": "path"
+                }
+            ]
         },
-        {
-            "pitch": -23.6,
-            "yaw": -101.7,
-            "cssClass": "custom-hotspot",
-            "createTooltipFunc": hotspot,
-            "createTooltipArgs": {
-                "image": "images/bowl.png",
-                "text": "Bowl"
-            }
-        },
-        {
-            "pitch": -19.3,
-            "yaw": 39.2,
-            "cssClass": "custom-hotspot",
-            "createTooltipFunc": hotspot,
-            "createTooltipArgs": {
-                "image": "images/manioc_root.png",
-                "text": "Manioc Root"
-            }
+        "path": {
+            "title": "Path",
+            "hfov": 110,
+            "pitch": -3,
+            "yaw": 117,
+            "type": "equirectangular",
+            "panorama": "images/GS__0083.JPG",
+            //"hotSpotDebug": true,
+            "hotSpots": [
+                {
+                    "pitch": 10.1,
+                    "yaw": -151,
+                    "cssClass": "custom-hotspot",
+                    "createTooltipFunc": hotspot,
+                    "createTooltipArgs": {
+                        "image": "images/chonta_bundle.png",
+                        "text": "Chonta Bundle"
+                    }
+                },
+                {
+                   "pitch": -55,
+                    "yaw": 70,
+                    "cssClass": "custom-hotspot",
+                    "createTooltipFunc": hotspot,
+                    "createTooltipArgs": {
+                        "image": "images/blowgun_dart_case.png",
+                        "text": "Blowgun Dart Case"
+                    } 
+                },
+                {
+                    "pitch": -3.2,
+                    "yaw": -1.5,
+                    "type": "scene",
+                    "text": "Beach",
+                    "sceneId": "beach"
+                }
+            ]
         }
-    ]
+
+    }
 });
 
 // Hot spot creation function
@@ -111,6 +169,11 @@ function hotspot(hotSpotDiv, args) {
     span.style.marginLeft = -(span.scrollWidth - hotSpotDiv.offsetWidth) / 2 + 'px';
     span.style.marginTop = -span.scrollHeight - 12 + 'px';
 }
+
+function showPanel(event, args){
+    // Function for displaying info panel on hotspot click
+}
+
 </script>
 
 </body>
