@@ -62,6 +62,13 @@
     }
     </style>
 </head>
+    <div class="container">
+        <div class="popup">
+            <h2>INFO:</h2>
+            <p>Here will be the information for each item</p>
+            <button type="button">X</button>
+        </div>
+    </div>
 <body>
 
 <div id="panorama"></div>
@@ -93,9 +100,8 @@ viewer = pannellum.viewer('panorama', ﻿{
                         "image": "images/bowl.png",
                         "text": "Bowl"
                     },
-                    // "clickHandlerFunc": showPanel,
-                    // "clickHandlerArgs": {"panelId": "bowl-panel"} 
-                    // ^ TODO: Fix null read error on clickHandlerFunc
+                    "clickHandlerFunc": showPanel,
+                    "clickHandlerArgs": {"panelId": "bowl-panel"} 
                 },
                 {
                     "pitch": -19.3,
@@ -105,7 +111,9 @@ viewer = pannellum.viewer('panorama', ﻿{
                     "createTooltipArgs": {
                         "image": "images/manioc_root.png",
                         "text": "Manioc Root"
-                    }
+                    },
+                    "clickHandlerFunc": showPanel,
+                    "clickHandlerArgs": {"panelId": "manioc-root-panel"} 
                 },
                 {
                     "pitch": -2.2,
@@ -133,7 +141,9 @@ viewer = pannellum.viewer('panorama', ﻿{
                     "createTooltipArgs": {
                         "image": "images/chonta_bundle.png",
                         "text": "Chonta Bundle"
-                    }
+                    },
+                    "clickHandlerFunc": showPanel,
+                    "clickHandlerArgs": {"panelId": "chonta-bundle-panel"} 
                 },
                 {
                    "pitch": -55,
@@ -143,7 +153,9 @@ viewer = pannellum.viewer('panorama', ﻿{
                     "createTooltipArgs": {
                         "image": "images/blowgun_dart_case.png",
                         "text": "Blowgun Dart Case"
-                    } 
+                    },
+                    "clickHandlerFunc": showPanel,
+                    "clickHandlerArgs": {"panelId": "blowgun-dart-case-panel"} 
                 },
                 {
                     "pitch": -3.2,
@@ -171,6 +183,7 @@ function hotspot(hotSpotDiv, args) {
 }
 
 function showPanel(event, args){
+    alert(args.panelId + " clicked!");
     // Function for displaying info panel on hotspot click
 }
 
