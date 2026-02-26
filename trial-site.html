@@ -27,11 +27,15 @@
         background-repeat: no-repeat;
         background-position: center;
     }
-    .info-page {
+    div.info-page span{
+        visibility: hidden;
+        position: absolute;
+        border-radius: 3px;
         height: 500px;
         width: 500px;
         background: #fff;
         background-position: center;
+        text-align: center;
     }
     div.custom-tooltip span {
         visibility: hidden;
@@ -62,13 +66,6 @@
     }
     </style>
 </head>
-    <div class="container">
-        <div class="popup">
-            <h2>INFO:</h2>
-            <p>Here will be the information for each item</p>
-            <button type="button">X</button>
-        </div>
-    </div>
 <body>
 
 <div id="panorama"></div>
