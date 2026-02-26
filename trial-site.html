@@ -64,15 +64,98 @@
         left: -10px;
         margin: 0 50%;
     }
+
+    /* Info Panel Styles */
+    .info-panel {
+        display: none; /* Hidden by default */
+        position: fixed;
+        z-index: 99999; /* Very high to work in fullscreen */
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent overlay */
+        overflow-y: auto; /* Allow scrolling */
+        pointer-events: auto; /* Catch all clicks */
+    }
+
+    .info-panel-content {
+        background-color: #fff;
+        margin: 5% auto;
+        padding: 30px;
+        border-radius: 10px;
+        width: 80%;
+        max-width: 600px;
+        max-height: 85vh; /* Limit height to 85% of viewport */
+        position: relative;
+        animation: slideDown 0.3s ease-out;
+        overflow-y: auto; /* Allow scrolling within content */
+        pointer-events: auto; /* Ensure content is clickable */
+    }
+
+    @keyframes slideDown {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .close-btn {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close-btn:hover,
+    .close-btn:focus {
+        color: #000;
+    }
+
+    #panel-title {
+        margin-top: 0;
+        color: #333;
+    }
+
+    #panel-image {
+        width: 100%;
+        max-width: 400px;
+        max-height: 400px; /* Limit image height */
+        height: auto;
+        display: block;
+        margin: 20px auto;
+        object-fit: contain; /* Keep aspect ratio */
+    }
+
+    #panel-description {
+        color: #666;
+        line-height: 1.6;
+        font-size: 16px;
+    }
     </style>
 </head>
 <body>
 
-<div id="panorama"></div>
+<div id="panorama">
+    <!-- Info Panel - Must be inside panorama for fullscreen -->
+    <div id="info-panel" class="info-panel">
+        <div class="info-panel-content">
+            <span class="close-btn">&times;</span>
+            <h2 id="panel-title">Title</h2>
+            <img id="panel-image" src="" alt="">
+            <p id="panel-description">Description goes here</p>
+        </div>
+    </div>
+</div>
 
 <script>
 // Create viewer
-viewer = pannellum.viewer('panorama', ﻿{
+viewer = pannellum.viewer('panorama', {
     "default": {
         "firstScene": "beach",
         "sceneFadeDuration": 1000
@@ -179,10 +262,82 @@ function hotspot(hotSpotDiv, args) {
     span.style.marginTop = -span.scrollHeight - 12 + 'px';
 }
 
-function showPanel(event, args){
-    alert(args.panelId + " clicked!");
-    // Function for displaying info panel on hotspot click
+// Show panel function
+function showPanel(event, args) {
+    // Get the panel element
+    var panel = document.getElementById('info-panel');
+    
+    // Get content based on which hotspot was clicked
+    var content = getPanelContent(args.panelId);
+    
+    // Update panel content
+    document.getElementById('panel-title').innerHTML = content.title;
+    document.getElementById('panel-image').src = content.image;
+    document.getElementById('panel-description').innerHTML = content.description;
+    
+    // Show the panel
+    panel.style.display = 'block';
 }
+
+// Function to get content for each hotspot
+function getPanelContent(panelId) {
+    var contents = {
+        "bowl-panel": {
+            title: "Bowl",
+            image: "images/bowl.png",
+            description: "Information goes here"
+        },
+        "manioc-root-panel": {
+            title: "Manioc Root",
+            image: "images/manioc_root.png",
+            description: "Information goes here"
+        },
+        "chonta-bundle-panel": {
+            title: "Chonta Bundle",
+            image: "images/chonta_bundle.png",
+            description: "Information goes here"
+        },
+        "blowgun-dart-case-panel": {
+            title: "Blowgun Dart Case",
+            image: "images/blowgun_dart_case.png",
+            description: "Information goes here"
+        }
+    };
+    
+    return contents[panelId];
+}
+
+// Close panel event handlers
+document.addEventListener('DOMContentLoaded', function() {
+    var closeBtn = document.querySelector('.close-btn');
+    var panel = document.getElementById('info-panel');
+    var panelContent = document.querySelector('.info-panel-content');
+    
+    // Prevent panorama interaction when clicking on panel content
+    panelContent.onclick = function(event) {
+        event.stopPropagation();
+    };
+    
+    // Close when clicking X button
+    closeBtn.onclick = function(event) {
+        event.stopPropagation();
+        panel.style.display = 'none';
+    };
+    
+    // Close when clicking outside the content (on the dark overlay)
+    panel.onclick = function(event) {
+        if (event.target === panel) {
+            panel.style.display = 'none';
+        }
+    };
+    
+    // Close when pressing Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && panel.style.display === 'block') {
+            panel.style.display = 'none';
+        }
+    });
+});
 
 </script>
 
