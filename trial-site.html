@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Custom hot spots</title>
+    <title>Heritage Roots | 360 Website </title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
     <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
     <div class="center">
@@ -36,6 +36,11 @@
         background: #fff;
         background-position: center;
         text-align: center;
+    }
+    .voice-over-container {
+        display: flex;
+        justify-content: center;
+        align-items: center 
     }
     div.custom-tooltip span {
         visibility: hidden;
@@ -147,9 +152,17 @@
         <div class="info-panel-content">
             <span class="close-btn">&times;</span>
             <h2 id="panel-title">Title</h2>
-            <img id="panel-image" src="" alt="">
+            <img id="panel-image" src="" alt="" width="250">
+            <video id="panel-video" controls width="500" position="relative" style="display:none;">
+                <source id="panel-video-source" src="" type="video/mp4" />
+            </video>
             <p id="panel-description">Description goes here</p>
         </div>
+    </div>
+    <div id="voice-over-container" class="voice-over-container">
+        <audio id="voice-over" controls loop>
+            <source src="audios/agouti_story.wav" type="audio/wav" />
+        </audio>
     </div>
 </div>
 
@@ -169,7 +182,7 @@ viewer = pannellum.viewer('panorama', {
             "yaw": 117,
             "type": "equirectangular",
             "panorama": "images/GS__0077.JPG",
-            "hotSpotDebug": true,
+            //"hotSpotDebug": true,
             "hotSpots": [
                 {
                     "pitch": -23.6,
@@ -274,6 +287,19 @@ function showPanel(event, args) {
     document.getElementById('panel-title').innerHTML = content.title;
     document.getElementById('panel-image').src = content.image;
     document.getElementById('panel-description').innerHTML = content.description;
+    var videoElement = document.getElementById('panel-video');
+    if(content.video != "") {
+        videoElement.src = content.video;
+        videoElement.load();
+        videoElement.style.display = 'block';
+    }
+    else{
+        videoElement.src = "";
+        videoElement.style.display = 'none';
+    }
+
+    var voiceOver = document.getElementById('voice-over');
+    voiceOver.pause();
     
     // Show the panel
     panel.style.display = 'block';
@@ -285,22 +311,26 @@ function getPanelContent(panelId) {
         "bowl-panel": {
             title: "Bowl",
             image: "images/bowl.png",
-            description: "Information goes here"
+            description: "Information goes here",
+            video: ""
         },
         "manioc-root-panel": {
             title: "Manioc Root",
             image: "images/manioc_root.png",
-            description: "Information goes here"
+            description: "Information goes here",
+            video: ""
         },
         "chonta-bundle-panel": {
             title: "Chonta Bundle",
             image: "images/chonta_bundle.png",
-            description: "Information goes here"
+            description: "Information goes here",
+            video: "videos/waking_up_tree_edited.mp4"
         },
         "blowgun-dart-case-panel": {
             title: "Blowgun Dart Case",
             image: "images/blowgun_dart_case.png",
-            description: "Information goes here"
+            description: "Information goes here",
+            video: ""
         }
     };
     
@@ -320,21 +350,41 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Close when clicking X button
     closeBtn.onclick = function(event) {
+        var videoElement = document.getElementById('panel-video');
+        if(videoElement.src != ""){
+            videoElement.pause();
+        }
         event.stopPropagation();
+        var voiceOver = document.getElementById('voice-over');
+        voiceOver.play();
         panel.style.display = 'none';
     };
-    
+
     // Close when clicking outside the content (on the dark overlay)
     panel.onclick = function(event) {
+        var videoElement = document.getElementById('panel-video');
+        if(videoElement.src != ""){
+            videoElement.pause();
+        }
         if (event.target === panel) {
             panel.style.display = 'none';
         }
+        var voiceOver = document.getElementById('voice-over');
+        voiceOver.play();
     };
     
     // Close when pressing Escape key
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape' && panel.style.display === 'block') {
+            if(videoElement.src != ""){
+            videoElement.pause();
+        }
+        if (event.target === panel) {
             panel.style.display = 'none';
+        }
+        var voiceOver = document.getElementById('voice-over');
+        voiceOver.play();
+        panel.style.display = 'none';
         }
     });
 });
