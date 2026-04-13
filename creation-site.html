@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Heritage Roots | 360 Website</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <div class="center">
+        <h1>Heritage Roots</h1>
+    </div>
+
+    <style>
+    #panorama {
+        width: 800px;
+        height: 600px;
+        margin: auto;
+    }
+    .center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .custom-hotspot {
+        height: 100px;
+        width: 100px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+    div.custom-tooltip span {
+        visibility: hidden;
+        position: absolute;
+        border-radius: 3px;
+        background-color: #fff;
+        color: #000;
+        text-align: center;
+        max-width: 200px;
+        padding: 5px 10px;
+        margin-left: -220px;
+        cursor: default;
+    }
+    div.custom-tooltip:hover span {
+        visibility: visible;
+    }
+    div.custom-tooltip:hover span:after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 0;
+        border-width: 10px;
+        border-style: solid;
+        border-color: #fff transparent transparent transparent;
+        bottom: -20px;
+        left: -10px;
+        margin: 0 50%;
+    }
+    .info-panel {
+        display: none;
+        position: fixed;
+        z-index: 99999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        overflow-y: auto;
+        pointer-events: auto;
+    }
+    .info-panel-content {
+        background-color: #fff;
+        margin: 5% auto;
+        padding: 30px;
+        border-radius: 10px;
+        width: 80%;
+        max-width: 600px;
+        max-height: 85vh;
+        position: relative;
+        animation: slideDown 0.3s ease-out;
+        overflow-y: auto;
+        pointer-events: auto;
+    }
+    @keyframes slideDown {
+        from { transform: translateY(-50px); opacity: 0; }
+        to   { transform: translateY(0);    opacity: 1; }
+    }
+    .close-btn {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .close-btn:hover,
+    .close-btn:focus {
+        color: #000;
+    }
+    #panel-title {
+        margin-top: 0;
+        color: #333;
+    }
+    #panel-image {
+        width: 100%;
+        max-width: 400px;
+        max-height: 400px;
+        height: auto;
+        display: block;
+        margin: 20px auto;
+        object-fit: contain;
+    }
+    #panel-description {
+        color: #666;
+        line-height: 1.6;
+        font-size: 16px;
+    }
+    .voice-over-container {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    #palette {
+        position: fixed;
+        top: 50%;
+        right: 20px;
+        transform: translateY(-50%);
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: rgba(0, 0, 0, 0.6);
+        padding: 12px 10px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    #palette-label {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 10px;
+        font-family: sans-serif;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 4px;
+    }
+    .palette-item {
+        width: 64px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        cursor: grab;
+        padding: 6px;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        transition: background 0.15s, border-color 0.15s;
+        user-select: none;
+    }
+    .palette-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.25);
+    }
+    .palette-item:active {
+        cursor: grabbing;
+    }
+    .palette-item img {
+        width: 44px;
+        height: 44px;
+        object-fit: contain;
+        pointer-events: none;
+    }
+    .palette-item span {
+        color: #fff;
+        font-size: 9px;
+        font-family: sans-serif;
+        text-align: center;
+        line-height: 1.2;
+        pointer-events: none;
+    }
+    #panorama.drag-over {
+        outline: 3px dashed rgba(255, 220, 80, 0.7);
+        outline-offset: -3px;
+    }
+    </style>
+</head>
+<body>
+
+<div id="panorama"></div>
+
+<div id="palette">
+    <div id="palette-label">Drag to place</div>
+    <div class="palette-item" draggable="true" data-panel-id="bowl-panel">
+        <img src="images/bowl.png" alt="Bowl">
+        <span>Bowl</span>
+    </div>
+    <div class="palette-item" draggable="true" data-panel-id="manioc-root-panel">
+        <img src="images/manioc_root.png" alt="Manioc Root">
+        <span>Manioc Root</span>
+    </div>
+    <div class="palette-item" draggable="true" data-panel-id="chonta-bundle-panel">
+        <img src="images/chonta_bundle.png" alt="Chonta Bundle">
+        <span>Chonta Bundle</span>
+    </div>
+    <div class="palette-item" draggable="true" data-panel-id="blowgun-dart-case-panel">
+        <img src="images/blowgun_dart_case.png" alt="Blowgun Dart Case">
+        <span>Blowgun Dart Case</span>
+    </div>
+</div>
+
+<div id="info-panel" class="info-panel">
+    <div class="info-panel-content">
+        <span class="close-btn">&times;</span>
+        <h2 id="panel-title">Title</h2>
+        <img id="panel-image" src="" alt="" width="250">
+        <video id="panel-video" controls width="500" style="display:none; position:relative;">
+            <source id="panel-video-source" src="" type="video/mp4" />
+        </video>
+        <p id="panel-description">Description goes here</p>
+    </div>
+</div>
+
+<div class="voice-over-container">
+    <audio id="voice-over" controls loop>
+        <source src="audios/agouti_story.wav" type="audio/wav" />
+    </audio>
+</div>
+
+<script>
+var viewer;
+var currentScene = 'beach';
+var draggingPanelId = null;
+
+var sceneHotspots = {
+    beach: [
+        {
+            pitch: -23.6,
+            yaw: -101.7,
+            cssClass: 'custom-hotspot',
+            createTooltipFunc: hotspot,
+            createTooltipArgs: { image: 'images/bowl.png', text: 'Bowl' },
+            clickHandlerFunc: showPanel,
+            clickHandlerArgs: { panelId: 'bowl-panel' }
+        },
+        {
+            pitch: -19.3,
+            yaw: 39.2,
+            cssClass: 'custom-hotspot',
+            createTooltipFunc: hotspot,
+            createTooltipArgs: { image: 'images/manioc_root.png', text: 'Manioc Root' },
+            clickHandlerFunc: showPanel,
+            clickHandlerArgs: { panelId: 'manioc-root-panel' }
+        },
+        {
+            pitch: -2.2,
+            yaw: -126.6,
+            type: 'scene',
+            text: 'Path to Jungle',
+            sceneId: 'path'
+        }
+    ],
+    path: [
+        {
+            pitch: 10.1,
+            yaw: -151,
+            cssClass: 'custom-hotspot',
+            createTooltipFunc: hotspot,
+            createTooltipArgs: { image: 'images/chonta_bundle.png', text: 'Chonta Bundle' },
+            clickHandlerFunc: showPanel,
+            clickHandlerArgs: { panelId: 'chonta-bundle-panel' }
+        },
+        {
+            pitch: -55,
+            yaw: 70,
+            cssClass: 'custom-hotspot',
+            createTooltipFunc: hotspot,
+            createTooltipArgs: { image: 'images/blowgun_dart_case.png', text: 'Blowgun Dart Case' },
+            clickHandlerFunc: showPanel,
+            clickHandlerArgs: { panelId: 'blowgun-dart-case-panel' }
+        },
+        {
+            pitch: -3.2,
+            yaw: -1.5,
+            type: 'scene',
+            text: 'Beach',
+            sceneId: 'beach'
+        }
+    ]
+};
+
+function buildScenesConfig() {
+    return {
+        beach: {
+            title: 'Beach',
+            hfov: 110,
+            pitch: -3,
+            yaw: 117,
+            type: 'equirectangular',
+            panorama: 'images/GS__0077.JPG',
+            hotSpots: sceneHotspots.beach
+        },
+        path: {
+            title: 'Path',
+            hfov: 110,
+            pitch: -3,
+            yaw: 117,
+            type: 'equirectangular',
+            panorama: 'images/GS__0083.JPG',
+            hotSpots: sceneHotspots.path
+        }
+    };
+}
+
+function initViewer(startScene) {
+    viewer = pannellum.viewer('panorama', {
+        default: {
+            firstScene: startScene || currentScene,
+            sceneFadeDuration: 1000
+        },
+        scenes: buildScenesConfig()
+    });
+
+    viewer.on('scenechange', function(id) {
+        currentScene = id;
+    });
+}
+
+function rebuildViewer() {
+    var savedPitch = viewer.getPitch();
+    var savedYaw   = viewer.getYaw();
+    var savedHfov  = viewer.getHfov();
+
+    var scenes = buildScenesConfig();
+    scenes[currentScene].pitch = savedPitch;
+    scenes[currentScene].yaw   = savedYaw;
+    scenes[currentScene].hfov  = savedHfov;
+
+    viewer.destroy();
+
+    viewer = pannellum.viewer('panorama', {
+        default: {
+            firstScene: currentScene,
+            sceneFadeDuration: 0
+        },
+        scenes: scenes
+    });
+
+    viewer.on('scenechange', function(id) {
+        currentScene = id;
+    });
+}
+
+function hotspot(hotSpotDiv, args) {
+    hotSpotDiv.style.backgroundImage = 'url(\'' + args.image + '\')';
+    hotSpotDiv.classList.add('custom-tooltip');
+    var span = document.createElement('span');
+    span.innerHTML = args.text;
+    hotSpotDiv.appendChild(span);
+    span.style.width = span.scrollWidth - 20 + 'px';
+    span.style.marginLeft = -(span.scrollWidth - hotSpotDiv.offsetWidth) / 2 + 'px';
+    span.style.marginTop = -span.scrollHeight - 12 + 'px';
+}
+
+function showPanel(event, args) {
+    var panel = document.getElementById('info-panel');
+    var content = getPanelContent(args.panelId);
+    document.getElementById('panel-title').innerHTML = content.title;
+    document.getElementById('panel-image').src = content.image;
+    document.getElementById('panel-description').innerHTML = content.description;
+    var videoElement = document.getElementById('panel-video');
+    if (content.video !== '') {
+        videoElement.src = content.video;
+        videoElement.load();
+        videoElement.style.display = 'block';
+    } else {
+        videoElement.src = '';
+        videoElement.style.display = 'none';
+    }
+    var voiceOver = document.getElementById('voice-over');
+    voiceOver.pause();
+    panel.style.display = 'block';
+}
+
+function getPanelContent(panelId) {
+    var contents = {
+        'bowl-panel': {
+            title: 'Bowl',
+            image: 'images/bowl.png',
+            description: 'Information goes here',
+            video: ''
+        },
+        'manioc-root-panel': {
+            title: 'Manioc Root',
+            image: 'images/manioc_root.png',
+            description: 'Information goes here',
+            video: ''
+        },
+        'chonta-bundle-panel': {
+            title: 'Chonta Bundle',
+            image: 'images/chonta_bundle.png',
+            description: 'Information goes here',
+            video: 'videos/waking_up_tree_edited.mp4'
+        },
+        'blowgun-dart-case-panel': {
+            title: 'Blowgun Dart Case',
+            image: 'images/blowgun_dart_case.png',
+            description: 'Information goes here',
+            video: ''
+        }
+    };
+    return contents[panelId];
+}
+
+document.querySelectorAll('.palette-item').forEach(function(el) {
+    el.addEventListener('dragstart', function(e) {
+        draggingPanelId = el.dataset.panelId;
+        e.dataTransfer.effectAllowed = 'copy';
+    });
+    el.addEventListener('dragend', function() {
+        draggingPanelId = null;
+    });
+});
+
+var panoEl = document.getElementById('panorama');
+
+panoEl.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+    panoEl.classList.add('drag-over');
+});
+
+panoEl.addEventListener('dragleave', function(e) {
+    if (!panoEl.contains(e.relatedTarget)) {
+        panoEl.classList.remove('drag-over');
+    }
+});
+
+panoEl.addEventListener('drop', function(e) {
+    e.preventDefault();
+    panoEl.classList.remove('drag-over');
+    if (!draggingPanelId || !viewer) return;
+
+    var rect = panoEl.getBoundingClientRect();
+    var x = e.clientX - rect.left;
+    var y = e.clientY - rect.top;
+
+    var hfov  = viewer.getHfov();
+    var vfov  = hfov * (rect.height / rect.width);
+    var yaw   = viewer.getYaw()   + (x / rect.width  - 0.5) * hfov;
+    var pitch = viewer.getPitch() - (y / rect.height - 0.5) * vfov;
+
+    pitch = Math.round(pitch * 10) / 10;
+    yaw   = Math.round(yaw   * 10) / 10;
+
+    var content = getPanelContent(draggingPanelId);
+    sceneHotspots[currentScene].push({
+        pitch: pitch,
+        yaw: yaw,
+        cssClass: 'custom-hotspot',
+        createTooltipFunc: hotspot,
+        createTooltipArgs: { image: content.image, text: content.title },
+        clickHandlerFunc: showPanel,
+        clickHandlerArgs: { panelId: draggingPanelId }
+    });
+
+    draggingPanelId = null;
+    rebuildViewer();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    initViewer('beach');
+
+    var closeBtn = document.querySelector('.close-btn');
+    var panel = document.getElementById('info-panel');
+    var panelContent = document.querySelector('.info-panel-content');
+
+    panelContent.onclick = function(event) {
+        event.stopPropagation();
+    };
+
+    closeBtn.onclick = function(event) {
+        var videoElement = document.getElementById('panel-video');
+        if (videoElement.src !== '') {
+            videoElement.pause();
+        }
+        event.stopPropagation();
+        var voiceOver = document.getElementById('voice-over');
+        voiceOver.play();
+        panel.style.display = 'none';
+    };
+
+    panel.onclick = function(event) {
+        var videoElement = document.getElementById('panel-video');
+        if (videoElement.src !== '') {
+            videoElement.pause();
+        }
+        if (event.target === panel) {
+            panel.style.display = 'none';
+        }
+        var voiceOver = document.getElementById('voice-over');
+        voiceOver.play();
+    };
+
+    document.addEventListener('keydown', function(event) {
+        var videoElement = document.getElementById('panel-video');
+        if (event.key === 'Escape' && panel.style.display === 'block') {
+            if (videoElement.src !== '') {
+                videoElement.pause();
+            }
+            panel.style.display = 'none';
+            var voiceOver = document.getElementById('voice-over');
+            voiceOver.play();
+        }
+    });
+});
+</script>
+
+</body>
+</html>
